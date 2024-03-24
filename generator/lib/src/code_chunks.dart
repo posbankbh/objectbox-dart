@@ -35,7 +35,7 @@ class CodeChunks {
 
     export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
-    final _entities = <$obxInt.ModelEntity>[
+    final entities = <$obxInt.ModelEntity>[
       ${model.entities.map(createModelEntity).join(',')}
     ];
 
