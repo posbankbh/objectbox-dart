@@ -91,7 +91,7 @@ class EntityResolver extends Builder {
     }
 
     // read all suitable annotated properties
-    for (var f in classElement.fields) {
+    for (var f in getAllFields(classElement)) {
       // The field might be implicitly defined by a getter, aka it is synthetic
       // and does not exist in code. So always resolve the actual non-synthetic
       // element that exists in code (here a getter) as only it will have any
@@ -514,6 +514,29 @@ class EntityResolver extends Builder {
       info.writeAll([' ', param.type]);
       return info.toString();
     }).toList(growable: false);
+  }
+
+  List<FieldElement> getAllFields(ClassElement classElement) {
+    List<FieldElement> fields = [];
+
+    // Function to recursively get fields of a class and its superclasses
+    void getFields(InterfaceElement ce) {
+      // Add fields of the current class
+      fields.addAll(ce.fields);
+
+      // Get superclass and continue if it exists
+      InterfaceType? supertype = ce.supertype;
+      if (supertype != null) {
+        var superclass = supertype.element;
+        // Recursively get fields of the superclass
+        getFields(superclass);
+      }
+    }
+
+    // Start with the given class
+    getFields(classElement);
+
+    return fields;
   }
 }
 
