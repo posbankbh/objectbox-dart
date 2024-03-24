@@ -526,7 +526,7 @@ class EntityResolver extends Builder {
 
       // Get superclass and continue if it exists
       InterfaceType? supertype = ce.supertype;
-      if (supertype != null && !supertype.isDartCoreType) {
+      if (supertype != null && !supertype.isDartCoreObject) {
         var superclass = supertype.element;
         // Recursively get fields of the superclass
         getFields(superclass);
