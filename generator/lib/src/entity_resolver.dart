@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:objectbox/internal.dart';
 import 'package:objectbox/objectbox.dart';
+import 'package:objectbox_generator/src/config.dart';
 import 'package:source_gen/source_gen.dart';
 
 /// EntityResolver finds all classes with an @Entity annotation and generates '.objectbox.info' files in build cache.
@@ -19,6 +20,8 @@ class EntityResolver extends Builder {
     '.dart': [suffix]
   };
 
+  Config config;
+
   final _entityChecker = const TypeChecker.fromRuntime(Entity);
   final _propertyChecker = const TypeChecker.fromRuntime(Property);
   final _idChecker = const TypeChecker.fromRuntime(Id);
@@ -27,6 +30,8 @@ class EntityResolver extends Builder {
   final _uniqueChecker = const TypeChecker.fromRuntime(Unique);
   final _indexChecker = const TypeChecker.fromRuntime(Index);
   final _backlinkChecker = const TypeChecker.fromRuntime(Backlink);
+
+  EntityResolver(this.config);
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -472,10 +477,20 @@ class EntityResolver extends Builder {
       // Get superclass and continue if it exists
       InterfaceType? supertype = ce.supertype;
       if (supertype != null && !supertype.isDartCoreObject) {
-      log.warning(ce.name);
         var superclass = supertype.element;
-        // Recursively get fields of the superclass
-        getFields(superclass);
+        if (!config.classesToIgnore.contains(superclass.name)) {
+          // Recursively get fields of the superclass
+          getFields(superclass);
+        }
+      }
+
+      // Get mixings and continue if it exists
+      for (var mixin in ce.mixins) {
+        var element = mixin.element;
+        if (!config.classesToIgnore.contains(element.name)) {
+          // Recursively get fields of the mixin
+          getFields(element);
+        }
       }
     }
 

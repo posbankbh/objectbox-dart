@@ -21,12 +21,9 @@ class Config {
   final String codeFile;
   final String outDirLib;
   final String outDirTest;
+  final List<String> classesToIgnore;
 
-  Config(
-      {String? jsonFile,
-      String? codeFile,
-      String? outDirLib,
-      String? outDirTest})
+  Config({String? jsonFile, String? codeFile, String? outDirLib, String? outDirTest, this.classesToIgnore = const []})
       : jsonFile = jsonFile ?? 'objectbox-model.json',
         codeFile = codeFile ?? 'objectbox.g.dart',
         outDirLib = outDirLib ?? '',
@@ -39,7 +36,9 @@ class Config {
       if (yaml != null) {
         late final String? outDirLib;
         late final String? outDirTest;
+        List<String> classesToIgnore = [];
         final outDirYaml = yaml['output_dir'];
+        final ignoreClasses = yaml['ignore_super_classes'];
 
         if (outDirYaml is YamlMap) {
           outDirLib = outDirYaml['lib'];
@@ -48,7 +47,11 @@ class Config {
           outDirLib = outDirTest = outDirYaml as String?;
         }
 
-        return Config(outDirLib: outDirLib, outDirTest: outDirTest);
+        if (ignoreClasses is YamlList) {
+          classesToIgnore = ignoreClasses.nodes.map((e) => e.value.toString()).toList();
+        }
+
+        return Config(outDirLib: outDirLib, outDirTest: outDirTest, classesToIgnore: classesToIgnore);
       }
     }
     return Config();
