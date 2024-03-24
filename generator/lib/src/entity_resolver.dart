@@ -37,34 +37,25 @@ class EntityResolver extends Builder {
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
     for (var annotatedEl in libReader.annotatedWith(_entityChecker)) {
-      entities.add(generateForAnnotatedElement(
-              annotatedEl.element, annotatedEl.annotation)
-          .toMap());
+      entities.add(generateForAnnotatedElement(annotatedEl.element, annotatedEl.annotation).toMap());
     }
 
     if (entities.isEmpty) return;
 
     final json = JsonEncoder().convert(entities);
-    await buildStep.writeAsString(
-        buildStep.inputId.changeExtension(suffix), json);
+    await buildStep.writeAsString(buildStep.inputId.changeExtension(suffix), json);
   }
 
-  ModelEntity generateForAnnotatedElement(
-      Element classElement, ConstantReader annotation) {
+  ModelEntity generateForAnnotatedElement(Element classElement, ConstantReader annotation) {
     if (classElement is! ClassElement) {
-      throw InvalidGenerationSourceError(
-          "Entity '${classElement.name}': annotated element must be a class.");
+      throw InvalidGenerationSourceError("Entity '${classElement.name}': annotated element must be a class.");
     }
 
     // process basic entity (note that allModels.createEntity is not used, as the entity will be merged)
     final entityUid = annotation.read('uid');
     final entityRealClass = annotation.read('realClass');
-    final entity = ModelEntity.create(
-        IdUid(0, entityUid.isNull ? 0 : entityUid.intValue),
-        entityRealClass.isNull
-            ? classElement.name
-            : entityRealClass.typeValue.element!.name!,
-        null,
+    final entity = ModelEntity.create(IdUid(0, entityUid.isNull ? 0 : entityUid.intValue),
+        entityRealClass.isNull ? classElement.name : entityRealClass.typeValue.element!.name!, null,
         uidRequest: !entityUid.isNull && entityUid.intValue == 0);
 
     if (_syncChecker.hasAnnotationOfExact(classElement)) {
@@ -82,10 +73,7 @@ class EntityResolver extends Builder {
     // Note: `.correspondingSetter == null` is also true for `final` fields.
     final readOnlyFields = <String>{};
     for (var f in classElement.accessors) {
-      if (f.isGetter &&
-          f.correspondingSetter == null &&
-          !entity.constructorParams
-              .any((String param) => param.startsWith('${f.name} '))) {
+      if (f.isGetter && f.correspondingSetter == null && !entity.constructorParams.any((String param) => param.startsWith('${f.name} '))) {
         readOnlyFields.add(f.name);
       }
     }
@@ -143,8 +131,7 @@ class EntityResolver extends Builder {
         } else {
           fieldType = detectObjectBoxType(f, classElement.name);
           if (fieldType == null) {
-            log.warning(
-                "  Skipping property '${f.name}': type '${f.type}' not supported,"
+            log.warning("  Skipping property '${f.name}': type '${f.type}' not supported,"
                 " consider creating a relation for @Entity types (https://docs.objectbox.io/relations),"
                 " or replace with getter/setter converting to a supported type (https://docs.objectbox.io/advanced/custom-types).");
             continue;
@@ -159,39 +146,30 @@ class EntityResolver extends Builder {
               "use a type like ToOne<TargetEntity> or ToMany<TargetEntity>.");
           continue;
         }
-        relTargetName =
-            (f.type as ParameterizedType).typeArguments[0].element!.name;
+        relTargetName = (f.type as ParameterizedType).typeArguments[0].element!.name;
       }
 
-      final backlinkAnnotations =
-          _backlinkChecker.annotationsOfExact(annotated);
+      final backlinkAnnotations = _backlinkChecker.annotationsOfExact(annotated);
       if (backlinkAnnotations.isNotEmpty) {
         if (!isToManyRel) {
-          log.severe(
-              "  Skipping property '${f.name}': @Backlink() may only be used with ToMany.");
+          log.severe("  Skipping property '${f.name}': @Backlink() may only be used with ToMany.");
           continue;
         }
-        final backlinkField =
-            backlinkAnnotations.first.getField('to')!.toStringValue()!;
-        final backlink = ModelBacklink(
-            name: f.name, srcEntity: relTargetName!, srcField: backlinkField);
+        final backlinkField = backlinkAnnotations.first.getField('to')!.toStringValue()!;
+        final backlink = ModelBacklink(name: f.name, srcEntity: relTargetName!, srcField: backlinkField);
         entity.backlinks.add(backlink);
         log.info('  $backlink');
       } else if (isToManyRel) {
         // create relation
-        final rel = ModelRelation.create(IdUid(0, propUid ?? 0), f.name,
-            targetName: relTargetName,
-            uidRequest: propUid != null && propUid == 0);
+        final rel =
+            ModelRelation.create(IdUid(0, propUid ?? 0), f.name, targetName: relTargetName, uidRequest: propUid != null && propUid == 0);
         entity.relations.add(rel);
 
         log.info('  $rel');
       } else {
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
-        final prop = ModelProperty.create(
-            IdUid(0, propUid ?? 0), f.name, fieldType,
-            flags: flags,
-            entity: entity,
-            uidRequest: propUid != null && propUid == 0);
+        final prop = ModelProperty.create(IdUid(0, propUid ?? 0), f.name, fieldType,
+            flags: flags, entity: entity, uidRequest: propUid != null && propUid == 0);
 
         if (fieldType == OBXPropertyType.Relation) {
           prop.name += 'Id';
@@ -204,12 +182,10 @@ class EntityResolver extends Builder {
         }
 
         // Index and unique annotation.
-        processAnnotationIndexUnique(
-            f, annotated, fieldType, classElement, prop);
+        processAnnotationIndexUnique(f, annotated, fieldType, classElement, prop);
 
         // for code generation
-        prop.dartFieldType =
-            f.type.element!.name! + (isNullable(f.type) ? '?' : '');
+        prop.dartFieldType = f.type.element!.name! + (isNullable(f.type) ? '?' : '');
         entity.properties.add(prop);
       }
     }
@@ -220,8 +196,7 @@ class EntityResolver extends Builder {
     // for `setId()` won't compile. The only exception is when user uses
     // self-assigned IDs, then a different setter will be generated - one that
     // checks the ID being set is already the same, otherwise it must throw.
-    final idField = classElement.fields
-        .singleWhere((FieldElement f) => f.name == entity.idProperty.name);
+    final idField = classElement.fields.singleWhere((FieldElement f) => f.name == entity.idProperty.name);
     if (idField.setter == null) {
       if (!entity.idProperty.hasFlag(OBXPropertyFlags.ID_SELF_ASSIGNABLE)) {
         throw InvalidGenerationSourceError(
@@ -298,8 +273,7 @@ class EntityResolver extends Builder {
     } else if (dartType.element!.name == 'Float64List') {
       return OBXPropertyType.DoubleVector;
     } else if (dartType.element!.name == 'DateTime') {
-      log.warning(
-          "  DateTime property '${f.name}' in entity '$className' is stored and read using millisecond precision. "
+      log.warning("  DateTime property '${f.name}' in entity '$className' is stored and read using millisecond precision. "
           'To silence this warning, add an explicit type using @Property(type: PropertyType.date) or @Property(type: PropertyType.dateNano) annotation.');
       return OBXPropertyType.Date;
     } else if (isToOneRelationField(f)) {
@@ -312,12 +286,10 @@ class EntityResolver extends Builder {
 
   void processIdProperty(ModelEntity entity, ClassElement classElement) {
     // check properties explicitly annotated with @Id()
-    final annotated =
-        entity.properties.where((p) => p.hasFlag(OBXPropertyFlags.ID));
+    final annotated = entity.properties.where((p) => p.hasFlag(OBXPropertyFlags.ID));
     if (annotated.length > 1) {
       final names = annotated.map((e) => e.name).join(", ");
-      throw InvalidGenerationSourceError(
-          "Entity '${entity.name}': multiple fields ($names) annotated with @Id(), there may only be one.",
+      throw InvalidGenerationSourceError("Entity '${entity.name}': multiple fields ($names) annotated with @Id(), there may only be one.",
           element: classElement);
     }
 
@@ -330,38 +302,30 @@ class EntityResolver extends Builder {
       }
     } else {
       // if there are no annotated props, try to find one by name & type
-      final candidates = entity.properties.where((p) =>
-          p.name.toLowerCase() == 'id' && p.type == OBXPropertyType.Long);
+      final candidates = entity.properties.where((p) => p.name.toLowerCase() == 'id' && p.type == OBXPropertyType.Long);
       if (candidates.length != 1) {
-        throw InvalidGenerationSourceError(
-            "Entity '${entity.name}': no @Id() property found, add an int field annotated with @Id().",
+        throw InvalidGenerationSourceError("Entity '${entity.name}': no @Id() property found, add an int field annotated with @Id().",
             element: classElement);
       }
       candidates.first.flags |= OBXPropertyFlags.ID;
     }
 
     // finally, ensure ID field compatibility with other bindings
-    final idProperty =
-        entity.properties.singleWhere((p) => p.hasFlag(OBXPropertyFlags.ID));
+    final idProperty = entity.properties.singleWhere((p) => p.hasFlag(OBXPropertyFlags.ID));
 
     // IDs must not be tagged unsigned for compatibility reasons
     idProperty.flags &= ~OBXPropertyFlags.UNSIGNED;
   }
 
-  void processAnnotationIndexUnique(FieldElement f, Element annotatedElement,
-      int? fieldType, Element elementBare, ModelProperty prop) {
+  void processAnnotationIndexUnique(FieldElement f, Element annotatedElement, int? fieldType, Element elementBare, ModelProperty prop) {
     IndexType? indexType;
 
-    final indexAnnotation =
-        _indexChecker.firstAnnotationOfExact(annotatedElement);
-    final uniqueAnnotation =
-        _uniqueChecker.firstAnnotationOfExact(annotatedElement);
+    final indexAnnotation = _indexChecker.firstAnnotationOfExact(annotatedElement);
+    final uniqueAnnotation = _uniqueChecker.firstAnnotationOfExact(annotatedElement);
     if (indexAnnotation == null && uniqueAnnotation == null) return;
 
     // Throw if property type does not support any index.
-    if (fieldType == OBXPropertyType.Float ||
-        fieldType == OBXPropertyType.Double ||
-        fieldType == OBXPropertyType.ByteVector) {
+    if (fieldType == OBXPropertyType.Float || fieldType == OBXPropertyType.Double || fieldType == OBXPropertyType.ByteVector) {
       throw InvalidGenerationSourceError(
           "Entity '${elementBare.name}': @Index/@Unique is not supported for type '${f.type}' of field '${f.name}'.",
           element: f);
@@ -391,8 +355,7 @@ class EntityResolver extends Builder {
     }
 
     // Throw if HASH or HASH64 is not supported by property type.
-    if (!supportsHashIndex &&
-        (indexType == IndexType.hash || indexType == IndexType.hash64)) {
+    if (!supportsHashIndex && (indexType == IndexType.hash || indexType == IndexType.hash64)) {
       throw InvalidGenerationSourceError(
           "Entity '${elementBare.name}': a hash index is not supported for type '${f.type}' of field '${f.name}'",
           element: f);
@@ -401,10 +364,8 @@ class EntityResolver extends Builder {
     if (uniqueAnnotation != null && !uniqueAnnotation.isNull) {
       prop.flags |= OBXPropertyFlags.UNIQUE;
       // Determine unique conflict resolution.
-      final onConflictVal =
-          enumValueItem(uniqueAnnotation.getField('onConflict')!);
-      if (onConflictVal != null &&
-          ConflictStrategy.values[onConflictVal] == ConflictStrategy.replace) {
+      final onConflictVal = enumValueItem(uniqueAnnotation.getField('onConflict')!);
+      if (onConflictVal != null && ConflictStrategy.values[onConflictVal] == ConflictStrategy.replace) {
         prop.flags |= OBXPropertyFlags.UNIQUE_ON_CONFLICT_REPLACE;
       }
     }
@@ -420,16 +381,12 @@ class EntityResolver extends Builder {
         prop.flags |= OBXPropertyFlags.INDEX_HASH64;
         break;
       default:
-        throw InvalidGenerationSourceError(
-            "Entity '${elementBare.name}': index type $indexType not supported.",
-            element: f);
+        throw InvalidGenerationSourceError("Entity '${elementBare.name}': index type $indexType not supported.", element: f);
     }
   }
 
-  void ensureSingleUniqueReplace(
-      ModelEntity entity, ClassElement classElement) {
-    final uniqueReplaceProps = entity.properties
-        .where((p) => p.hasFlag(OBXPropertyFlags.UNIQUE_ON_CONFLICT_REPLACE));
+  void ensureSingleUniqueReplace(ModelEntity entity, ClassElement classElement) {
+    final uniqueReplaceProps = entity.properties.where((p) => p.hasFlag(OBXPropertyFlags.UNIQUE_ON_CONFLICT_REPLACE));
     if (uniqueReplaceProps.length > 1) {
       throw InvalidGenerationSourceError(
           "ConflictStrategy.replace can only be used on a single property, but found multiple in '${entity.name}':\n  ${uniqueReplaceProps.join('\n  ')}",
@@ -437,12 +394,10 @@ class EntityResolver extends Builder {
     }
   }
 
-  void ifSyncEnsureAllUniqueAreReplace(
-      ModelEntity entity, ClassElement classElement) {
+  void ifSyncEnsureAllUniqueAreReplace(ModelEntity entity, ClassElement classElement) {
     if (!entity.hasFlag(OBXEntityFlags.SYNC_ENABLED)) return;
     final uniqueButNotReplaceProps = entity.properties.where((p) {
-      return p.hasFlag(OBXPropertyFlags.UNIQUE) &&
-          !p.hasFlag(OBXPropertyFlags.UNIQUE_ON_CONFLICT_REPLACE);
+      return p.hasFlag(OBXPropertyFlags.UNIQUE) && !p.hasFlag(OBXPropertyFlags.UNIQUE_ON_CONFLICT_REPLACE);
     });
     if (uniqueButNotReplaceProps.isNotEmpty) {
       throw InvalidGenerationSourceError(
@@ -454,11 +409,7 @@ class EntityResolver extends Builder {
 
   int? enumValueItem(DartObject typeField) {
     if (!typeField.isNull) {
-      final enumValues = (typeField.type as InterfaceType)
-          .element
-          .fields
-          .where((f) => f.isEnumConstant)
-          .toList();
+      final enumValues = (typeField.type as InterfaceType).element.fields.where((f) => f.isEnumConstant).toList();
 
       // Find the index of the matching enum constant.
       for (var i = 0; i < enumValues.length; i++) {
@@ -474,28 +425,22 @@ class EntityResolver extends Builder {
   // find out @Property(type:) field value - its an enum PropertyType
   int? propertyTypeFromAnnotation(DartObject typeField) {
     final item = enumValueItem(typeField);
-    return item == null
-        ? null
-        : propertyTypeToOBXPropertyType(PropertyType.values[item]);
+    return item == null ? null : propertyTypeToOBXPropertyType(PropertyType.values[item]);
   }
 
   DartType? listItemType(DartType listType) {
-    final typeArgs =
-        listType is ParameterizedType ? listType.typeArguments : [];
+    final typeArgs = listType is ParameterizedType ? listType.typeArguments : [];
     return typeArgs.length == 1 ? typeArgs[0] : null;
   }
 
-  bool isRelationField(FieldElement f) =>
-      isToOneRelationField(f) || isToManyRelationField(f);
+  bool isRelationField(FieldElement f) => isToOneRelationField(f) || isToManyRelationField(f);
 
   bool isToOneRelationField(FieldElement f) => f.type.element!.name == 'ToOne';
 
-  bool isToManyRelationField(FieldElement f) =>
-      f.type.element!.name == 'ToMany';
+  bool isToManyRelationField(FieldElement f) => f.type.element!.name == 'ToMany';
 
   bool isNullable(DartType type) =>
-      type.nullabilitySuffix == NullabilitySuffix.star ||
-      type.nullabilitySuffix == NullabilitySuffix.question;
+      type.nullabilitySuffix == NullabilitySuffix.star || type.nullabilitySuffix == NullabilitySuffix.question;
 
   // Find an unnamed constructor we can use to initialize
   ConstructorElement? findConstructor(ClassElement entity) {
@@ -527,6 +472,7 @@ class EntityResolver extends Builder {
       // Get superclass and continue if it exists
       InterfaceType? supertype = ce.supertype;
       if (supertype != null && !supertype.isDartCoreObject) {
+      log.warning(ce.name + ',' + supertype.isDartCoreObject.toString());
         var superclass = supertype.element;
         // Recursively get fields of the superclass
         getFields(superclass);
