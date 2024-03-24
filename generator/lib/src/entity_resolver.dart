@@ -84,7 +84,8 @@ class EntityResolver extends Builder {
     }
 
     // read all suitable annotated properties
-    for (var f in getAllFields(classElement)) {
+    final allFields = getAllFields(classElement);
+    for (var f in allFields) {
       // The field might be implicitly defined by a getter, aka it is synthetic
       // and does not exist in code. So always resolve the actual non-synthetic
       // element that exists in code (here a getter) as only it will have any
@@ -201,7 +202,7 @@ class EntityResolver extends Builder {
     // for `setId()` won't compile. The only exception is when user uses
     // self-assigned IDs, then a different setter will be generated - one that
     // checks the ID being set is already the same, otherwise it must throw.
-    final idField = classElement.fields.singleWhere((FieldElement f) => f.name == entity.idProperty.name);
+    final idField = allFields.singleWhere((FieldElement f) => f.name == entity.idProperty.name);
     if (idField.setter == null) {
       if (!entity.idProperty.hasFlag(OBXPropertyFlags.ID_SELF_ASSIGNABLE)) {
         throw InvalidGenerationSourceError(
