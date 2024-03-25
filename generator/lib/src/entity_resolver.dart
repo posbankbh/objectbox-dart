@@ -40,7 +40,7 @@ class EntityResolver extends Builder {
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final libReader = LibraryReader(await buildStep.inputLibrary);
 
-             log.severe("Lib name '${libReader.element.name}'");
+    log.severe("Lib name '${libReader.element.name}'");
 
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
@@ -179,13 +179,16 @@ class EntityResolver extends Builder {
         final isEnum = _enumChecker.hasAnnotationOfExact(f.nonSynthetic);
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
-        final prop = ModelProperty.create(IdUid(0, propUid ?? 0), f.name, fieldType,
-            flags: flags,
-            entity: entity,
-            uidRequest: propUid != null && propUid == 0,
-            isEnum: isEnum,
-            enumName: isEnum ? f.name :null,
-            enumFilePath: isEnum ? f. : null);
+        final prop = ModelProperty.create(
+          IdUid(0, propUid ?? 0),
+          f.name,
+          fieldType,
+          flags: flags,
+          entity: entity,
+          uidRequest: propUid != null && propUid == 0,
+          isEnum: isEnum,
+          enumName: isEnum ? f.name : null,
+        );
 
         if (fieldType == OBXPropertyType.Relation) {
           prop.name += 'Id';
