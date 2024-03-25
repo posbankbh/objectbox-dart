@@ -40,7 +40,7 @@ class EntityResolver extends Builder {
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final libReader = LibraryReader(await buildStep.inputLibrary);
 
-    log.severe("Lib name '${libReader.element.source.uri}'");
+    log.severe("Lib name '${libReader.element.source.uri.toString()}'");
 
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
@@ -188,6 +188,7 @@ class EntityResolver extends Builder {
           uidRequest: propUid != null && propUid == 0,
           isEnum: isEnum,
           enumName: isEnum ? f.name : null,
+          dartFilePath: isEnum ? f.source?.uri.toString() : null,
         );
 
         if (fieldType == OBXPropertyType.Relation) {

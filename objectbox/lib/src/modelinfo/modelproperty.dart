@@ -26,7 +26,7 @@ class ModelProperty {
 
   final bool isEnum;
   final String? enumName;
-  final String? enumFilePath;
+  final String? dartFilePath;
 
   String get name => _name;
 
@@ -100,7 +100,7 @@ class ModelProperty {
       this.uidRequest = false,
       this.isEnum = false,
       this.enumName,
-      this.enumFilePath})
+      this.dartFilePath})
       : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
@@ -117,7 +117,7 @@ class ModelProperty {
         uidRequest = false,
         isEnum = false,
         enumName = null,
-        enumFilePath = null;
+        dartFilePath = null;
 
   ModelProperty.fromMap(Map<String, dynamic> data, ModelEntity? entity)
       : this.create(IdUid.fromString(data['id'] as String?), data['name'] as String?, data['type'] as int?,
