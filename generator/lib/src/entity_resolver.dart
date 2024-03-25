@@ -38,10 +38,9 @@ class EntityResolver extends Builder {
   FutureOr<void> build(BuildStep buildStep) async {
     final resolver = buildStep.resolver;
     if (!await resolver.isLibrary(buildStep.inputId)) return;
-    final lib = await buildStep.inputLibrary;
-    final libReader = LibraryReader(lib);
+    final libReader = LibraryReader(await buildStep.inputLibrary);
 
-    throw InvalidGenerationSourceError("Lib name '${lib.name}'");
+    log.severe("Lib name '${libReader.element.source}'");
 
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
