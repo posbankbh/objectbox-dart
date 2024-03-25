@@ -313,3 +313,6 @@ class Backlink {
   /// the field name of the desired source relation: Backlink('sourceField').
   const Backlink([this.to = '']);
 }
+
+///This is a flag to mark the property is actually an enum
+class EnumProperty {}

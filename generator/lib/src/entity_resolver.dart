@@ -30,6 +30,7 @@ class EntityResolver extends Builder {
   final _uniqueChecker = const TypeChecker.fromRuntime(Unique);
   final _indexChecker = const TypeChecker.fromRuntime(Index);
   final _backlinkChecker = const TypeChecker.fromRuntime(Backlink);
+  final _enumChecker = const TypeChecker.fromRuntime(EnumProperty);
 
   EntityResolver(this.config);
 
@@ -38,6 +39,8 @@ class EntityResolver extends Builder {
     final resolver = buildStep.resolver;
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final libReader = LibraryReader(await buildStep.inputLibrary);
+
+             log.severe("Lib name '${libReader.element.name}'");
 
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
@@ -86,9 +89,6 @@ class EntityResolver extends Builder {
     // read all suitable annotated properties
     final allFields = getAllFields(classElement);
     for (var f in allFields) {
-      if (f.isEnumConstant) {
-        throw InvalidGenerationSourceError('is enum');
-      }
       // The field might be implicitly defined by a getter, aka it is synthetic
       // and does not exist in code. So always resolve the actual non-synthetic
       // element that exists in code (here a getter) as only it will have any
@@ -176,9 +176,16 @@ class EntityResolver extends Builder {
 
         log.info('  $rel');
       } else {
+        final isEnum = _enumChecker.hasAnnotationOfExact(f.nonSynthetic);
+
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
         final prop = ModelProperty.create(IdUid(0, propUid ?? 0), f.name, fieldType,
-            flags: flags, entity: entity, uidRequest: propUid != null && propUid == 0);
+            flags: flags,
+            entity: entity,
+            uidRequest: propUid != null && propUid == 0,
+            isEnum: isEnum,
+            enumName: isEnum ? f.name :null,
+            enumFilePath: isEnum ? f. : null);
 
         if (fieldType == OBXPropertyType.Relation) {
           prop.name += 'Id';
@@ -287,6 +294,10 @@ class EntityResolver extends Builder {
       return OBXPropertyType.Date;
     } else if (isToOneRelationField(f)) {
       return OBXPropertyType.Relation;
+    }
+
+    if (_enumChecker.hasAnnotationOfExact(f.nonSynthetic)) {
+      return OBXPropertyType.String; //I decided to save enum as String in the database
     }
 
     // No supported Dart type recognized.

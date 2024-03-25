@@ -24,6 +24,10 @@ class ModelProperty {
   // whether the user requested UID information (started a rename process)
   final bool uidRequest;
 
+  final bool isEnum;
+  final String? enumName;
+  final String? enumFilePath;
+
   String get name => _name;
 
   set name(String? value) {
@@ -71,12 +75,9 @@ class ModelProperty {
     }
   }
 
-  String get fieldType => _dartFieldType!
-      .replaceFirst('?', '', _dartFieldType!.length - 1)
-      .replaceFirst(_fieldReadOnlyPrefix, '');
+  String get fieldType => _dartFieldType!.replaceFirst('?', '', _dartFieldType!.length - 1).replaceFirst(_fieldReadOnlyPrefix, '');
 
-  bool get fieldIsNullable =>
-      _dartFieldType!.substring(_dartFieldType!.length - 1) == '?';
+  bool get fieldIsNullable => _dartFieldType!.substring(_dartFieldType!.length - 1) == '?';
 
   IdUid? get indexId => _indexId;
 
@@ -96,7 +97,10 @@ class ModelProperty {
       this.entity,
       String? dartFieldType,
       this.relationTarget,
-      this.uidRequest = false})
+      this.uidRequest = false,
+      this.isEnum = false,
+      this.enumName,
+      this.enumFilePath})
       : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
@@ -105,22 +109,18 @@ class ModelProperty {
   }
 
   // used in generated code
-  ModelProperty(
-      {required this.id,
-      required String name,
-      required int type,
-      required int flags,
-      IdUid? indexId,
-      this.relationTarget})
+  ModelProperty({required this.id, required String name, required int type, required int flags, IdUid? indexId, this.relationTarget})
       : _name = name,
         _type = type,
         _flags = flags,
         _indexId = indexId,
-        uidRequest = false;
+        uidRequest = false,
+        isEnum = false,
+        enumName = null,
+        enumFilePath = null;
 
   ModelProperty.fromMap(Map<String, dynamic> data, ModelEntity? entity)
-      : this.create(IdUid.fromString(data['id'] as String?),
-            data['name'] as String?, data['type'] as int?,
+      : this.create(IdUid.fromString(data['id'] as String?), data['name'] as String?, data['type'] as int?,
             flags: data['flags'] as int? ?? 0,
             indexId: data['indexId'] as String?,
             entity: entity,
@@ -146,9 +146,7 @@ class ModelProperty {
   bool hasFlag(int flag) => (flags & flag) == flag;
 
   bool hasIndexFlag() =>
-      hasFlag(OBXPropertyFlags.INDEXED) ||
-      hasFlag(OBXPropertyFlags.INDEX_HASH) ||
-      hasFlag(OBXPropertyFlags.INDEX_HASH64);
+      hasFlag(OBXPropertyFlags.INDEXED) || hasFlag(OBXPropertyFlags.INDEX_HASH) || hasFlag(OBXPropertyFlags.INDEX_HASH64);
 
   bool get isRelation => type == OBXPropertyType.Relation;
 

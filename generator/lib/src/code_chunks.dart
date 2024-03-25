@@ -296,7 +296,11 @@ class CodeChunks {
       }
       switch (p.type) {
         case OBXPropertyType.String:
-          return '$assignment fbb.writeString($fieldName);';
+          if (p.isEnum) {
+            return '$assignment fbb.writeString($fieldName.name);';
+          } else {
+            return '$assignment fbb.writeString($fieldName);';
+          }
         case OBXPropertyType.StringVector:
           return '$assignment fbb.writeList($fieldName.map(fbb.writeString).toList(growable: false));';
         case OBXPropertyType.ByteVector:
@@ -482,7 +486,11 @@ class CodeChunks {
         case OBXPropertyType.String:
           // still makes sense to keep `asciiOptimization: true`
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
-          return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+          if (p.isEnum) {
+            return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+          } else {
+            return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+          }
         case OBXPropertyType.StringVector:
           // still makes sense to keep `asciiOptimization: true`
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
