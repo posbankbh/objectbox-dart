@@ -248,6 +248,10 @@ class EntityResolver extends Builder {
   int? detectObjectBoxType(FieldElement f, String className) {
     final dartType = f.type;
 
+    if (_enumChecker.hasAnnotationOfExact(f.nonSynthetic)) {
+      return OBXPropertyType.String; //I decided to save enum as String in the database
+    }
+
     if (dartType.isDartCoreInt) {
       // Dart: 8 bytes
       // ObjectBox: 8 bytes
@@ -296,10 +300,6 @@ class EntityResolver extends Builder {
       return OBXPropertyType.Date;
     } else if (isToOneRelationField(f)) {
       return OBXPropertyType.Relation;
-    }
-
-    if (_enumChecker.hasAnnotationOfExact(f.nonSynthetic)) {
-      return OBXPropertyType.String; //I decided to save enum as String in the database
     }
 
     // No supported Dart type recognized.
