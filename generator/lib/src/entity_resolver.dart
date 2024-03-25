@@ -185,7 +185,7 @@ class EntityResolver extends Builder {
           entity: entity,
           uidRequest: propUid != null && propUid == 0,
           isEnum: isEnum,
-          enumName: isEnum ? f.name : null,
+          enumName: isEnum ? f.type.getDisplayString(withNullability: false) : null,
           dartFilePath: isEnum ? f.source?.uri.toString() : null,
         );
 
