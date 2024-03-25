@@ -488,7 +488,7 @@ class CodeChunks {
           // still makes sense to keep `asciiOptimization: true`
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
           if (p.isEnum) {
-            return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+            return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)', defaultValue: 'to be put');
           } else {
             return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           }
