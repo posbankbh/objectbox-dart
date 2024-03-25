@@ -315,4 +315,7 @@ class Backlink {
 }
 
 ///This is a flag to mark the property is actually an enum
-class EnumProperty {}
+class EnumProperty {
+  ///Marker for enums
+  const EnumProperty();
+}
