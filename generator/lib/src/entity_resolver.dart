@@ -86,6 +86,9 @@ class EntityResolver extends Builder {
     // read all suitable annotated properties
     final allFields = getAllFields(classElement);
     for (var f in allFields) {
+      if (f.isEnumConstant) {
+        throw InvalidGenerationSourceError('is enum');
+      }
       // The field might be implicitly defined by a getter, aka it is synthetic
       // and does not exist in code. So always resolve the actual non-synthetic
       // element that exists in code (here a getter) as only it will have any
