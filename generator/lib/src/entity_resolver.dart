@@ -40,7 +40,7 @@ class EntityResolver extends Builder {
     if (!await resolver.isLibrary(buildStep.inputId)) return;
     final libReader = LibraryReader(await buildStep.inputLibrary);
 
-    log.severe("Lib name '${libReader.element.source.fullName}'");
+    log.severe("Lib name '${libReader.element.source.uri}'");
 
     // generate for all entities
     final entities = <Map<String, dynamic>>[];
