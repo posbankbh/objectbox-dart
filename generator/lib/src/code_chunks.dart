@@ -488,12 +488,12 @@ class CodeChunks {
         case OBXPropertyType.String:
           // still makes sense to keep `asciiOptimization: true`
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
+          var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           if (p.isEnum) {
             //TODO: MUST bring default valueB
-            var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
-            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue}';
+            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue)';
           } else {
-            return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+            return dbValue;
           }
         case OBXPropertyType.StringVector:
           // still makes sense to keep `asciiOptimization: true`
