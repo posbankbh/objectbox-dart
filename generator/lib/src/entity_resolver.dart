@@ -193,6 +193,7 @@ class EntityResolver extends Builder {
           enumName: enumInfo != null ? f.type.element!.name! : null,
           dartFilePath: enumInfo != null ? f.type.element!.source!.uri.toString() : null,
           enumDefaultValue: defaultValue != null ? '${f.type.element!.name!}.$defaultValue' : null,
+          isMap: f.type.isDartCoreMap,
         );
 
         if (fieldType == OBXPropertyType.Relation) {
@@ -287,6 +288,8 @@ class EntityResolver extends Builder {
       } else if (itemType.isDartCoreString) {
         // List<String>
         return OBXPropertyType.StringVector;
+      } else if (itemType.isDartCoreMap) {
+        return OBXPropertyType.String;
       }
     } else if (['Int8List', 'Uint8List'].contains(dartType.element!.name)) {
       return OBXPropertyType.ByteVector;

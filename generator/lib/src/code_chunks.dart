@@ -24,6 +24,7 @@ class CodeChunks {
     // coverage:ignore-file
 
     import 'dart:typed_data';
+    import 'dart:convert';
 
     import 'package:flat_buffers/flat_buffers.dart' as fb;
     import 'package:objectbox/internal.dart' as $obxInt; // generated code can access "internal" functionality
@@ -301,6 +302,8 @@ class CodeChunks {
         case OBXPropertyType.String:
           if (p.isEnum) {
             return '$assignment fbb.writeString($fieldName.name);';
+          } else if (p.isMap) {
+            return 'jsonEncode($assignment fbb.writeString($fieldName));';
           } else {
             return '$assignment fbb.writeString($fieldName);';
           }
@@ -492,6 +495,8 @@ class CodeChunks {
           var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           if (p.isEnum) {
             return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue, orElse: () => ${p.enumDefaultValue})';
+          } else if (p.isMap) {
+            return 'jsonDecode($dbValue)';
           } else {
             return dbValue;
           }

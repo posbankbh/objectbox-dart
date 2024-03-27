@@ -25,6 +25,7 @@ class ModelProperty {
   final bool uidRequest;
 
   bool isEnum;
+  bool isMap;
   String? enumName;
   String? dartFilePath;
   String? enumDefaultValue;
@@ -92,18 +93,22 @@ class ModelProperty {
   }
 
   // used in code generator
-  ModelProperty.create(this.id, String? name, int? type,
-      {int flags = 0,
-      String? indexId,
-      this.entity,
-      String? dartFieldType,
-      this.relationTarget,
-      this.uidRequest = false,
-      this.isEnum = false,
-      this.enumName,
-      this.dartFilePath,
-      this.enumDefaultValue})
-      : _dartFieldType = dartFieldType {
+  ModelProperty.create(
+    this.id,
+    String? name,
+    int? type, {
+    int flags = 0,
+    String? indexId,
+    this.entity,
+    String? dartFieldType,
+    this.relationTarget,
+    this.uidRequest = false,
+    this.isEnum = false,
+    this.enumName,
+    this.dartFilePath,
+    this.enumDefaultValue,
+    this.isMap = false,
+  }) : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
     this.flags = flags;
@@ -119,6 +124,7 @@ class ModelProperty {
       IdUid? indexId,
       this.relationTarget,
       this.isEnum = false,
+      this.isMap = false,
       this.enumName,
       this.dartFilePath,
       this.enumDefaultValue})
@@ -137,6 +143,7 @@ class ModelProperty {
             relationTarget: data['relationTarget'] as String?,
             uidRequest: data['uidRequest'] as bool? ?? false,
             isEnum: data['isEnum'] as bool? ?? false,
+            isMap: data['isMap'] as bool? ?? false,
             enumName: data['enumName'] as String?,
             dartFilePath: data['dartFilePath'] as String?,
             enumDefaultValue: data['enumDefaultValue'] as String?);
@@ -157,6 +164,7 @@ class ModelProperty {
     ret['enumName'] = enumName;
     ret['dartFilePath'] = dartFilePath;
     ret['enumDefaultValue'] = enumDefaultValue;
+    ret['isMap'] = isMap;
     return ret;
   }
 
