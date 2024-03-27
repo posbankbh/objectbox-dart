@@ -224,6 +224,7 @@ class CodeChunks {
   }
 
   static String fieldDefaultValue(ModelProperty p) {
+    if (p.isEnum) return 'null'; //TODO: find another way
     switch (p.fieldType) {
       case 'int':
       case 'double':
