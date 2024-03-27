@@ -183,9 +183,9 @@ class EntityResolver extends Builder {
         String? mapKeyType;
         String? mapValueType;
         if (f.type.isDartCoreMap) {
-          final mapElement = f.type.element as ClassElement;
-          mapKeyType = mapElement.typeParameters[0].getDisplayString(withNullability: true);
-          mapValueType = mapElement.typeParameters[1].getDisplayString(withNullability: true);
+          final mapElement = f.type as ParameterizedType;
+          mapKeyType = mapElement.typeArguments[0].getDisplayString(withNullability: true);
+          mapValueType = mapElement.typeArguments[1].getDisplayString(withNullability: true);
         }
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
