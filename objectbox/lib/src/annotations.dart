@@ -320,5 +320,5 @@ class EnumProperty {
   final Enum? defaultValue;
 
   ///Marker for enums
-  const EnumProperty(this.defaultValue);
+  const EnumProperty({this.defaultValue});
 }
