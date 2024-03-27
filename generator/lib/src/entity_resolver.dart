@@ -186,7 +186,7 @@ class EntityResolver extends Builder {
           uidRequest: propUid != null && propUid == 0,
           isEnum: isEnum,
           enumName: isEnum ? f.type.element!.name! : null,
-          dartFilePath: isEnum ? f.source?.uri.toString() : null,
+          dartFilePath: isEnum ? f.type.element!.source!.uri.toString() : null,
         );
 
         if (fieldType == OBXPropertyType.Relation) {
