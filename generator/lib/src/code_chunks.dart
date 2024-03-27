@@ -732,12 +732,12 @@ class CodeChunks {
   }
 
   static String getUserImports(ModelInfo model) {
-    final files = model.entities.expand((e) => e.properties.where((e) => e.dartFilePath != null).map((e) => e.dartFilePath!)).toList();
+    final files = model.entities.expand((e) => e.properties.where((e) => e.dartFilePath != null).map((e) => e.dartFilePath!)).toSet();
     if (files.isEmpty) return '';
 
     StringBuffer sb = StringBuffer();
     for (var element in files) {
-      sb.writeln('import' '$element' '');
+      sb.writeln("import '$element';");
     }
     return sb.toString();
   }
