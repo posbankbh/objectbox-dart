@@ -137,9 +137,14 @@ class EntityResolver extends Builder {
         } else {
           fieldType = detectObjectBoxType(f, classElement.name);
           if (fieldType == null) {
-            log.warning("  Skipping property '${f.name}': type '${f.type}' not supported,"
+            final txt = "  Skipping property '${f.name}': type '${f.type}' not supported,"
                 " consider creating a relation for @Entity types (https://docs.objectbox.io/relations),"
-                " or replace with getter/setter converting to a supported type (https://docs.objectbox.io/advanced/custom-types).");
+                " or replace with getter/setter converting to a supported type (https://docs.objectbox.io/advanced/custom-types).";
+            if (config.skipNotSupportedProperty) {
+              log.warning(txt);
+            } else {
+              log.severe(txt);
+            }
             continue;
           }
         }
