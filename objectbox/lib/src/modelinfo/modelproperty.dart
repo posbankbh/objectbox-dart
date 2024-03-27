@@ -29,6 +29,8 @@ class ModelProperty {
   String? enumName;
   String? dartFilePath;
   String? enumDefaultValue;
+  String? mapKeyType;
+  String? mapValueType;
 
   String get name => _name;
 
@@ -108,6 +110,8 @@ class ModelProperty {
     this.dartFilePath,
     this.enumDefaultValue,
     this.isMap = false,
+    this.mapKeyType,
+    this.mapValueType,
   }) : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
@@ -135,18 +139,24 @@ class ModelProperty {
         uidRequest = false;
 
   ModelProperty.fromMap(Map<String, dynamic> data, ModelEntity? entity)
-      : this.create(IdUid.fromString(data['id'] as String?), data['name'] as String?, data['type'] as int?,
-            flags: data['flags'] as int? ?? 0,
-            indexId: data['indexId'] as String?,
-            entity: entity,
-            dartFieldType: data['dartFieldType'] as String?,
-            relationTarget: data['relationTarget'] as String?,
-            uidRequest: data['uidRequest'] as bool? ?? false,
-            isEnum: data['isEnum'] as bool? ?? false,
-            isMap: data['isMap'] as bool? ?? false,
-            enumName: data['enumName'] as String?,
-            dartFilePath: data['dartFilePath'] as String?,
-            enumDefaultValue: data['enumDefaultValue'] as String?);
+      : this.create(
+          IdUid.fromString(data['id'] as String?),
+          data['name'] as String?,
+          data['type'] as int?,
+          flags: data['flags'] as int? ?? 0,
+          indexId: data['indexId'] as String?,
+          entity: entity,
+          dartFieldType: data['dartFieldType'] as String?,
+          relationTarget: data['relationTarget'] as String?,
+          uidRequest: data['uidRequest'] as bool? ?? false,
+          isEnum: data['isEnum'] as bool? ?? false,
+          isMap: data['isMap'] as bool? ?? false,
+          enumName: data['enumName'] as String?,
+          dartFilePath: data['dartFilePath'] as String?,
+          enumDefaultValue: data['enumDefaultValue'] as String?,
+          mapKeyType: data['mapKeyType'] as String?,
+          mapValueType: data['mapValueType'] as String?,
+        );
 
   Map<String, dynamic> toMap({bool forModelJson = false}) {
     final ret = <String, dynamic>{};
@@ -165,6 +175,8 @@ class ModelProperty {
     ret['dartFilePath'] = dartFilePath;
     ret['enumDefaultValue'] = enumDefaultValue;
     ret['isMap'] = isMap;
+    ret['mapKeyType'] = mapKeyType;
+    ret['mapValueType'] = mapValueType;
     return ret;
   }
 

@@ -198,6 +198,8 @@ class CodeBuilder extends Builder {
     propInModel.dartFilePath = prop.dartFilePath;
     propInModel.enumDefaultValue = prop.enumDefaultValue;
     propInModel.isMap = prop.isMap;
+    propInModel.mapKeyType = prop.mapKeyType;
+    propInModel.mapValueType = prop.mapValueType;
 
     if (!prop.hasIndexFlag()) {
       propInModel.removeIndex();

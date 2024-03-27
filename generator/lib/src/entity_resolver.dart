@@ -180,6 +180,13 @@ class EntityResolver extends Builder {
       } else {
         final enumInfo = _enumChecker.firstAnnotationOf(f.nonSynthetic);
         final defaultValue = enumInfo?.getField('defaultValue')?.getField('_name')?.toStringValue();
+        String? mapKeyType;
+        String? mapValueType;
+        if (f.type.isDartCoreMap) {
+          final mapElement = f.type.element as ClassElement;
+          mapKeyType = mapElement.typeParameters[0].getDisplayString(withNullability: true);
+          mapValueType = mapElement.typeParameters[1].getDisplayString(withNullability: true);
+        }
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
         final prop = ModelProperty.create(
@@ -194,6 +201,8 @@ class EntityResolver extends Builder {
           dartFilePath: enumInfo != null ? f.type.element!.source!.uri.toString() : null,
           enumDefaultValue: defaultValue,
           isMap: f.type.isDartCoreMap,
+          mapKeyType: mapKeyType,
+          mapValueType: mapValueType,
         );
 
         if (fieldType == OBXPropertyType.Relation) {

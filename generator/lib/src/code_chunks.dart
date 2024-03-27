@@ -442,9 +442,9 @@ class CodeChunks {
         preLines.add('final $valueVar = $dbValue;');
 
         if (p.fieldIsNullable) {
-          return '$valueVar == null ? null : jsonDecode($valueVar)';
+          return '$valueVar == null ? null : (jsonDecode($valueVar) as Map?).cast<${p.mapKeyType}, ${p.mapValueType}>()';
         } else {
-          return 'jsonDecode($valueVar);';
+          return '(jsonDecode($valueVar) as Map).cast<${p.mapKeyType}, ${p.mapValueType}>()';
         }
       }
 
