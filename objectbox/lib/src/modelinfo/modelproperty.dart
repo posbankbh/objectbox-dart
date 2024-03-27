@@ -126,7 +126,10 @@ class ModelProperty {
             entity: entity,
             dartFieldType: data['dartFieldType'] as String?,
             relationTarget: data['relationTarget'] as String?,
-            uidRequest: data['uidRequest'] as bool? ?? false);
+            uidRequest: data['uidRequest'] as bool? ?? false,
+            isEnum: data['isEnum'] as bool? ?? false,
+            enumName: data['enumName'] as String?,
+            dartFilePath: data['dartFilePath'] as String?);
 
   Map<String, dynamic> toMap({bool forModelJson = false}) {
     final ret = <String, dynamic>{};
@@ -140,6 +143,9 @@ class ModelProperty {
       ret['dartFieldType'] = _dartFieldType;
       ret['uidRequest'] = uidRequest;
     }
+    ret['isEnum'] = isEnum;
+    ret['enumName'] = enumName;
+    ret['dartFilePath'] = dartFilePath;
     return ret;
   }
 
