@@ -437,15 +437,14 @@ class CodeChunks {
 
       //Special for maps
       if (p.isMap) {
-        final valueVar = '${propertyFieldName(p)}Value';
         final tempVar = '${propertyFieldName(p)}Temp';
         final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
         var line = 'final $tempVar = $dbValue;';
         line += '\n';
         if (p.fieldIsNullable) {
-          line += 'final $valueVar = $tempVar == null ? null : jsonDecode($tempVar);';
+          line += '$tempVar == null ? null : jsonDecode($tempVar);';
         } else {
-          line += 'final $valueVar = jsonDecode($tempVar);';
+          line += 'jsonDecode($tempVar);';
         }
         return line;
       }
