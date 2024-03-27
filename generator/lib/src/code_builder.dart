@@ -142,7 +142,7 @@ class CodeBuilder extends Builder {
         .map((file) => file.replaceFirst(EntityResolver.suffix, '.dart').replaceFirst('${builderDirs.root}/', prefix ?? ''))
         .toList();
 
-    imports.addAll(getPropertiesDartFiles(model));
+    imports.addAll(model.entities.expand((e) => e.properties.where((e) => e.dartFilePath != null).map((e) => e.dartFilePath!)).toSet());
 
     var code = CodeChunks.objectboxDart(model, imports, pubspec);
 
@@ -348,13 +348,6 @@ class CodeBuilder extends Builder {
       throw InvalidGenerationSourceError("Unknown relation backlink source for '${entity.name}.${bl.name}'");
     }
   }
-}
-
-Iterable<String> getPropertiesDartFiles(ModelInfo model) {
-  return model.entities
-      .expand((e) => e.properties.where((e) => e.dartFilePath != null).map((e) => e.dartFilePath!))
-      .toSet()
-      .map((x) => "import '$x';");
 }
 
 Never handleUidRequest(String annotationName, String name, IdUid currentId, ModelInfo model) => throw InvalidGenerationSourceError('''
