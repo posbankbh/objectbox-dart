@@ -153,7 +153,7 @@ class CodeChunks {
       id: ${createIdUid(property.id)},
       name: '${property.name}',
       type: ${property.type},
-      flags: ${property.flags},
+      flags: ${property.flags}
       $additionalArgs
     )
     ''';
