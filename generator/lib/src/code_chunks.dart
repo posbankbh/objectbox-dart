@@ -442,7 +442,11 @@ class CodeChunks {
         final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
         var line = 'final $tempVar = $dbValue;';
         line += '\n';
-        line += 'final $valueVar = $tempVar == null ? null : jsonDecode($tempVar);';
+        if (p.fieldIsNullable) {
+          line += 'final $valueVar = $tempVar == null ? null : jsonDecode($tempVar);';
+        } else {
+          line += 'final $valueVar = jsonDecode($tempVar);';
+        }
         return line;
       }
 
