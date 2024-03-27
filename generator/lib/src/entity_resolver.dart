@@ -273,6 +273,8 @@ class EntityResolver extends Builder {
       // Dart: 8 bytes
       // ObjectBox: 8 bytes
       return OBXPropertyType.Double;
+    } else if (dartType.isDartCoreMap) {
+      return OBXPropertyType.String;
     } else if (dartType.isDartCoreList) {
       final itemType = listItemType(dartType)!;
       if (itemType.isDartCoreInt) {
@@ -288,8 +290,6 @@ class EntityResolver extends Builder {
       } else if (itemType.isDartCoreString) {
         // List<String>
         return OBXPropertyType.StringVector;
-      } else if (itemType.element?.name == 'Map') {
-        return OBXPropertyType.String;
       }
     } else if (['Int8List', 'Uint8List'].contains(dartType.element!.name)) {
       return OBXPropertyType.ByteVector;
