@@ -302,7 +302,7 @@ class CodeChunks {
           if (p.isEnum) {
             return '$assignment fbb.writeString($fieldName.name);';
           } else if (p.isMap) {
-            return 'jsonEncode($assignment fbb.writeString($fieldName));';
+            return '$assignment jsonEncode(fbb.writeString($fieldName));';
           } else {
             return '$assignment fbb.writeString($fieldName);';
           }
