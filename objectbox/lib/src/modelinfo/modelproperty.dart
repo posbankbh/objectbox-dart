@@ -24,9 +24,9 @@ class ModelProperty {
   // whether the user requested UID information (started a rename process)
   final bool uidRequest;
 
-  final bool isEnum;
-  final String? enumName;
-  final String? dartFilePath;
+  bool isEnum;
+  String? enumName;
+  String? dartFilePath;
 
   String get name => _name;
 
