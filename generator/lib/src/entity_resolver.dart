@@ -174,6 +174,7 @@ class EntityResolver extends Builder {
         log.info('  $rel');
       } else {
         final enumInfo = _enumChecker.firstAnnotationOf(f.nonSynthetic);
+        final defaultValue = enumInfo?.getField('defaultValue')?.toStringValue();
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
         final prop = ModelProperty.create(
@@ -186,7 +187,7 @@ class EntityResolver extends Builder {
           isEnum: enumInfo != null,
           enumName: enumInfo != null ? f.type.element!.name! : null,
           dartFilePath: enumInfo != null ? f.type.element!.source!.uri.toString() : null,
-          enumDefaultValue: enumInfo?.getField('defaultValue').toString(),
+          enumDefaultValue: defaultValue != null ? '${f.type.element!.name!}.$defaultValue' : null,
         );
 
         if (fieldType == OBXPropertyType.Relation) {
