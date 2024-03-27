@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
@@ -49,6 +50,7 @@ class EntityResolver extends Builder {
     if (entities.isEmpty) return;
 
     final json = JsonEncoder().convert(entities);
+    File('C:\\Users\\POSBANK LAP 1\\Pictures\\Camera Roll\\gen.txt').writeAsString(json); //TODO: remove
     await buildStep.writeAsString(buildStep.inputId.changeExtension(suffix), json);
   }
 
