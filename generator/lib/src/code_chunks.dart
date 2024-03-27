@@ -29,7 +29,6 @@ class CodeChunks {
     import 'package:flat_buffers/flat_buffers.dart' as fb;
     import 'package:objectbox/internal.dart' as $obxInt; // generated code can access "internal" functionality
     import 'package:objectbox/objectbox.dart' as $obx;${pubspec?.obxFlutterImport}
-    ${getUserImports(model)}
 
     import '${sorted(imports).join("';\n import '")}';
 
@@ -735,17 +734,6 @@ class CodeChunks {
       /// [${entity.name}] entity fields to define ObjectBox queries.
       class ${entity.name}_ {${fields.join()}}
     ''';
-  }
-
-  static String getUserImports(ModelInfo model) {
-    final files = model.entities.expand((e) => e.properties.where((e) => e.dartFilePath != null).map((e) => e.dartFilePath!)).toSet();
-    if (files.isEmpty) return '';
-
-    StringBuffer sb = StringBuffer();
-    for (var element in files) {
-      sb.writeln("import '$element';");
-    }
-    return sb.toString();
   }
 }
 

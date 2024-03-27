@@ -288,7 +288,7 @@ class EntityResolver extends Builder {
       } else if (itemType.isDartCoreString) {
         // List<String>
         return OBXPropertyType.StringVector;
-      } else if (itemType.isDartCoreMap) {
+      } else if (itemType.element?.name == 'Map') {
         return OBXPropertyType.String;
       }
     } else if (['Int8List', 'Uint8List'].contains(dartType.element!.name)) {
