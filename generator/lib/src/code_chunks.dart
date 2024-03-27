@@ -490,7 +490,7 @@ class CodeChunks {
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
           if (p.isEnum) {
             //TODO: MUST bring default value
-            return '${p.enumName}.values.firstWhere((x) => x.name == ${readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)', defaultValue: 'to be put')}';
+            return '${p.enumName}.values.firstWhere((x) => x.name == ${readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)', defaultValue: 'null')}';
           } else {
             return readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           }
