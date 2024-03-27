@@ -224,7 +224,8 @@ class CodeChunks {
   }
 
   static String fieldDefaultValue(ModelProperty p) {
-    if (p.isEnum) return 'null'; //TODO: find another way
+    if (p.isEnum) return p.enumDefaultValue ?? (p.fieldIsNullable ? 'null' : '');
+
     switch (p.fieldType) {
       case 'int':
       case 'double':
@@ -490,8 +491,7 @@ class CodeChunks {
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
           var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           if (p.isEnum) {
-            //TODO: MUST bring default valueB
-            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue)';
+            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue, orElse: () => ${p.enumDefaultValue})';
           } else {
             return dbValue;
           }

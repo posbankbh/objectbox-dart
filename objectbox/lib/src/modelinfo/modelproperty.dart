@@ -27,6 +27,7 @@ class ModelProperty {
   bool isEnum;
   String? enumName;
   String? dartFilePath;
+  String? enumDefaultValue;
 
   String get name => _name;
 
@@ -100,7 +101,8 @@ class ModelProperty {
       this.uidRequest = false,
       this.isEnum = false,
       this.enumName,
-      this.dartFilePath})
+      this.dartFilePath,
+      this.enumDefaultValue})
       : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
@@ -118,7 +120,8 @@ class ModelProperty {
       this.relationTarget,
       this.isEnum = false,
       this.enumName,
-      this.dartFilePath})
+      this.dartFilePath,
+      this.enumDefaultValue})
       : _name = name,
         _type = type,
         _flags = flags,
@@ -135,7 +138,8 @@ class ModelProperty {
             uidRequest: data['uidRequest'] as bool? ?? false,
             isEnum: data['isEnum'] as bool? ?? false,
             enumName: data['enumName'] as String?,
-            dartFilePath: data['dartFilePath'] as String?);
+            dartFilePath: data['dartFilePath'] as String?,
+            enumDefaultValue: data['enumDefaultValue'] as String?);
 
   Map<String, dynamic> toMap({bool forModelJson = false}) {
     final ret = <String, dynamic>{};
@@ -152,6 +156,7 @@ class ModelProperty {
     ret['isEnum'] = isEnum;
     ret['enumName'] = enumName;
     ret['dartFilePath'] = dartFilePath;
+    ret['enumDefaultValue'] = enumDefaultValue;
     return ret;
   }
 

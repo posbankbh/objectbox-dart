@@ -316,6 +316,9 @@ class Backlink {
 
 ///This is a flag to mark the property is actually an enum
 class EnumProperty {
+  ///Default value for enum
+  final Enum? defaultValue;
+
   ///Marker for enums
-  const EnumProperty();
+  const EnumProperty(this.defaultValue);
 }

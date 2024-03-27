@@ -194,6 +194,7 @@ class CodeBuilder extends Builder {
     propInModel.isEnum = prop.isEnum;
     propInModel.enumName = prop.enumName;
     propInModel.dartFilePath = prop.dartFilePath;
+    propInModel.enumDefaultValue = prop.enumDefaultValue;
 
     if (!prop.hasIndexFlag()) {
       propInModel.removeIndex();

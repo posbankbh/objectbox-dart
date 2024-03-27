@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
@@ -175,7 +173,7 @@ class EntityResolver extends Builder {
 
         log.info('  $rel');
       } else {
-        final isEnum = _enumChecker.hasAnnotationOfExact(f.nonSynthetic);
+        final enumInfo = _enumChecker.firstAnnotationOf(f.nonSynthetic);
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
         final prop = ModelProperty.create(
@@ -185,9 +183,10 @@ class EntityResolver extends Builder {
           flags: flags,
           entity: entity,
           uidRequest: propUid != null && propUid == 0,
-          isEnum: isEnum,
-          enumName: isEnum ? f.type.element!.name! : null,
-          dartFilePath: isEnum ? f.type.element!.source!.uri.toString() : null,
+          isEnum: enumInfo != null,
+          enumName: enumInfo != null ? f.type.element!.name! : null,
+          dartFilePath: enumInfo != null ? f.type.element!.source!.uri.toString() : null,
+          enumDefaultValue: enumInfo?.getField('defaultValue').toString(),
         );
 
         if (fieldType == OBXPropertyType.Relation) {
