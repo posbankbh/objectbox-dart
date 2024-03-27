@@ -154,8 +154,6 @@ class CodeChunks {
       name: '${property.name}',
       type: ${property.type},
       flags: ${property.flags},
-      isEnum: ${property.isEnum},
-      enumName: ${property.enumName}
       $additionalArgs
     )
     ''';

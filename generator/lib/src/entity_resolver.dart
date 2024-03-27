@@ -175,7 +175,9 @@ class EntityResolver extends Builder {
         log.info('  $rel');
       } else {
         final isEnum = _enumChecker.hasAnnotationOfExact(f.nonSynthetic);
-
+        if (isEnum) {
+          throw InvalidGenerationSourceError("there's enum here");
+        }
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
         final prop = ModelProperty.create(
           IdUid(0, propUid ?? 0),
