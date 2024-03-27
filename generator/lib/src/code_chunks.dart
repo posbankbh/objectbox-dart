@@ -438,13 +438,13 @@ class CodeChunks {
       //Special for maps
       if (p.isMap) {
         final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
-        final tempVar = '${propertyFieldName(p)}Value';
-        preLines.add('final $tempVar = $dbValue;');
+        final valueVar = '${propertyFieldName(p)}Value';
+        preLines.add('final $valueVar = $dbValue;');
 
         if (p.fieldIsNullable) {
-          return '$tempVar == null ? null : jsonDecode($tempVar);';
+          return '$valueVar == null ? null : jsonDecode($valueVar)';
         } else {
-          return 'jsonDecode($tempVar);';
+          return 'jsonDecode($valueVar);';
         }
       }
 
