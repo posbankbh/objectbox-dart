@@ -109,15 +109,21 @@ class ModelProperty {
   }
 
   // used in generated code
-  ModelProperty({required this.id, required String name, required int type, required int flags, IdUid? indexId, this.relationTarget})
+  ModelProperty(
+      {required this.id,
+      required String name,
+      required int type,
+      required int flags,
+      IdUid? indexId,
+      this.relationTarget,
+      this.isEnum = false,
+      this.enumName,
+      this.dartFilePath})
       : _name = name,
         _type = type,
         _flags = flags,
         _indexId = indexId,
-        uidRequest = false,
-        isEnum = false,
-        enumName = null,
-        dartFilePath = null;
+        uidRequest = false;
 
   ModelProperty.fromMap(Map<String, dynamic> data, ModelEntity? entity)
       : this.create(IdUid.fromString(data['id'] as String?), data['name'] as String?, data['type'] as int?,
