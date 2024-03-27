@@ -435,6 +435,17 @@ class CodeChunks {
         throw InvalidGenerationSourceError('Invalid property data type ${p.type} for a DateTime field ${entity.name}.${p.name}');
       }
 
+      //Special for maps
+      if (p.isMap) {
+        final valueVar = '${propertyFieldName(p)}Value';
+        final tempVar = '${propertyFieldName(p)}Temp';
+        final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+        var line = 'final $tempVar = $dbValue;';
+        line += '\n';
+        line += 'final $valueVar = $tempVar == null ? null : jsonDecode($tempVar);';
+        return line;
+      }
+
       switch (p.type) {
         case OBXPropertyType.ByteVector:
           if (['Int8List', 'Uint8List'].contains(p.fieldType)) {
@@ -491,11 +502,9 @@ class CodeChunks {
         case OBXPropertyType.String:
           // still makes sense to keep `asciiOptimization: true`
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
-          var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+          final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           if (p.isEnum) {
             return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue, orElse: () => ${p.enumDefaultValue == null ? null : '${p.enumName!}.${p.enumDefaultValue!}'})';
-          } else if (p.isMap) {
-            return 'jsonDecode($dbValue)';
           } else {
             return dbValue;
           }
