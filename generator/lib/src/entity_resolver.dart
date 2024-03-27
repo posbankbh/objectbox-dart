@@ -192,7 +192,7 @@ class EntityResolver extends Builder {
           isEnum: enumInfo != null,
           enumName: enumInfo != null ? f.type.element!.name! : null,
           dartFilePath: enumInfo != null ? f.type.element!.source!.uri.toString() : null,
-          enumDefaultValue: defaultValue != null ? '${f.type.element!.name!}.$defaultValue' : null,
+          enumDefaultValue: defaultValue,
           isMap: f.type.isDartCoreMap,
         );
 

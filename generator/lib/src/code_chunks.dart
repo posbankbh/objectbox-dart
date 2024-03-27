@@ -224,7 +224,7 @@ class CodeChunks {
   }
 
   static String fieldDefaultValue(ModelProperty p) {
-    if (p.isEnum) return p.enumDefaultValue ?? (p.fieldIsNullable ? 'null' : '');
+    if (p.isEnum) return p.enumDefaultValue == null ? (p.fieldIsNullable ? 'null' : '') : "'${p.enumDefaultValue}'";
 
     switch (p.fieldType) {
       case 'int':
@@ -302,7 +302,7 @@ class CodeChunks {
           if (p.isEnum) {
             return '$assignment fbb.writeString($fieldName.name);';
           } else if (p.isMap) {
-            return '$assignment jsonEncode(fbb.writeString($fieldName));';
+            return '$assignment fbb.writeString(jsonEncode($fieldName));';
           } else {
             return '$assignment fbb.writeString($fieldName);';
           }
@@ -493,7 +493,7 @@ class CodeChunks {
           // `readAll` faster(6.1ms) than when false(8.1ms) on Flutter 3.0.1, Dart 2.17.1
           var dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
           if (p.isEnum) {
-            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue, orElse: () => ${p.enumDefaultValue})';
+            return '${p.enumName}.values.firstWhere((x) => x.name == $dbValue, orElse: () => ${p.enumDefaultValue == null ? null : '${p.enumName!}.${p.enumDefaultValue!}'})';
           } else if (p.isMap) {
             return 'jsonDecode($dbValue)';
           } else {
