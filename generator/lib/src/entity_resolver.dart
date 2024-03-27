@@ -174,7 +174,7 @@ class EntityResolver extends Builder {
         log.info('  $rel');
       } else {
         final enumInfo = _enumChecker.firstAnnotationOf(f.nonSynthetic);
-        final defaultValue = enumInfo?.getField('defaultValue')?.variable?.computeConstantValue()?.toString();
+        final defaultValue = enumInfo?.getField('defaultValue')?.getField('_name')?.toStringValue();
         log.severe(defaultValue);
 
         // create property (do not use readEntity.createProperty in order to avoid generating new ids)
