@@ -301,7 +301,7 @@ class CodeChunks {
         case OBXPropertyType.String:
           if (p.isEnum) {
             return '$assignment fbb.writeString($fieldName.name);';
-          } else if (p.isMap) {
+          } else if (p.isMap || p.storeAsJson) {
             return '$assignment fbb.writeString(jsonEncode($fieldName));';
           } else {
             return '$assignment fbb.writeString($fieldName);';
@@ -445,6 +445,19 @@ class CodeChunks {
           return '$valueVar == null ? null : (jsonDecode($valueVar) as Map)?.cast<${p.mapKeyType}, ${p.mapValueType}>()';
         } else {
           return '(jsonDecode($valueVar) as Map).cast<${p.mapKeyType}, ${p.mapValueType}>()';
+        }
+      }
+
+      //Special for json
+      if (p.storeAsJson) {
+        final dbValue = readFieldCodeString(p, 'fb.StringReader(asciiOptimization: true)');
+        final valueVar = '${propertyFieldName(p)}Value';
+        preLines.add('final $valueVar = $dbValue;');
+
+        if (p.fieldIsNullable) {
+          return '$valueVar == null ? null : jsonDecode($valueVar)';
+        } else {
+          return 'jsonDecode($valueVar)';
         }
       }
 

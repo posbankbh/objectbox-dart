@@ -5,6 +5,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:objectbox/internal.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_generator/src/config.dart';
@@ -30,6 +31,7 @@ class EntityResolver extends Builder {
   final _indexChecker = const TypeChecker.fromRuntime(Index);
   final _backlinkChecker = const TypeChecker.fromRuntime(Backlink);
   final _enumChecker = const TypeChecker.fromRuntime(EnumProperty);
+  final _jsonSeriallizeChecker = const TypeChecker.fromRuntime(JsonSerializable);
 
   EntityResolver(this.config);
 
@@ -138,7 +140,7 @@ class EntityResolver extends Builder {
           fieldType = detectObjectBoxType(f, classElement.name);
           if (fieldType == null) {
             final txt = "  Skipping property '${f.name}': type '${f.type}' not supported,"
-                " consider creating a relation for @Entity types (https://docs.objectbox.io/relations),"
+                " consider creating a relation for @Entity types (https://docs.objectbox.io/relations), or make the type @JsonSerializable"
                 " or replace with getter/setter converting to a supported type (https://docs.objectbox.io/advanced/custom-types).";
             if (config.skipNotSupportedProperty) {
               log.warning(txt);
@@ -179,6 +181,7 @@ class EntityResolver extends Builder {
         log.info('  $rel');
       } else {
         final enumInfo = _enumChecker.firstAnnotationOf(f.nonSynthetic);
+        final storeAsJson = fieldType == OBXPropertyType.String && _jsonSeriallizeChecker.hasAnnotationOf(f.type.element!);
         final defaultValue = enumInfo?.getField('defaultValue')?.getField('_name')?.toStringValue();
         String? mapKeyType;
         String? mapValueType;
@@ -203,6 +206,7 @@ class EntityResolver extends Builder {
           isMap: f.type.isDartCoreMap,
           mapKeyType: mapKeyType,
           mapValueType: mapValueType,
+          storeAsJson: storeAsJson,
         );
 
         if (fieldType == OBXPropertyType.Relation) {
@@ -264,10 +268,6 @@ class EntityResolver extends Builder {
   int? detectObjectBoxType(FieldElement f, String className) {
     final dartType = f.type;
 
-    if (_enumChecker.hasAnnotationOfExact(f.nonSynthetic)) {
-      return OBXPropertyType.String; //I decided to save enum as String in the database
-    }
-
     if (dartType.isDartCoreInt) {
       // Dart: 8 bytes
       // ObjectBox: 8 bytes
@@ -318,6 +318,15 @@ class EntityResolver extends Builder {
       return OBXPropertyType.Date;
     } else if (isToOneRelationField(f)) {
       return OBXPropertyType.Relation;
+    }
+
+    if (_enumChecker.hasAnnotationOfExact(f.nonSynthetic)) {
+      return OBXPropertyType.String; //I decided to save enum as String in the database
+    }
+
+    //Check if type is seriallizable
+    if (_jsonSeriallizeChecker.hasAnnotationOf(dartType.element!)) {
+      return OBXPropertyType.String;
     }
 
     // No supported Dart type recognized.

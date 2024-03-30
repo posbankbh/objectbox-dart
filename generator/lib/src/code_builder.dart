@@ -200,6 +200,7 @@ class CodeBuilder extends Builder {
     propInModel.isMap = prop.isMap;
     propInModel.mapKeyType = prop.mapKeyType;
     propInModel.mapValueType = prop.mapValueType;
+    propInModel.storeAsJson = prop.storeAsJson;
 
     if (!prop.hasIndexFlag()) {
       propInModel.removeIndex();

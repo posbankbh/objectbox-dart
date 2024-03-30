@@ -31,6 +31,7 @@ class ModelProperty {
   String? enumDefaultValue;
   String? mapKeyType;
   String? mapValueType;
+  bool storeAsJson = false;
 
   String get name => _name;
 
@@ -112,6 +113,7 @@ class ModelProperty {
     this.isMap = false,
     this.mapKeyType,
     this.mapValueType,
+    this.storeAsJson = false,
   }) : _dartFieldType = dartFieldType {
     this.name = name;
     this.type = type;
@@ -156,6 +158,7 @@ class ModelProperty {
           enumDefaultValue: data['enumDefaultValue'] as String?,
           mapKeyType: data['mapKeyType'] as String?,
           mapValueType: data['mapValueType'] as String?,
+          storeAsJson: data['storeAsJson'] as bool? ?? false,
         );
 
   Map<String, dynamic> toMap({bool forModelJson = false}) {
@@ -177,6 +180,7 @@ class ModelProperty {
     ret['isMap'] = isMap;
     ret['mapKeyType'] = mapKeyType;
     ret['mapValueType'] = mapValueType;
+    ret['storeAsJson'] = storeAsJson;
     return ret;
   }
 
